@@ -1,0 +1,37 @@
+{
+  "name": "es6_babel_browserify_gulp_demo",
+  "version": "1.0.0",
+  "description": "FED development workflow",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dongtong/es6_babel_browserify_gulp_demo.git"
+  },
+  "keywords": [
+    "es6",
+    "babel",
+    "browserify",
+    "gulp",
+    "node",
+    "web",
+    "fed"
+  ],
+  "author": "dongtong",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dongtong/es6_babel_browserify_gulp_demo/issues"
+  },
+  "homepage": "https://github.com/dongtong/es6_babel_browserify_gulp_demo#readme",
+  "dependencies": {
+    "babelify": "^7.2.0",
+    "browserify": "^12.0.1",
+    "del": "^2.1.0",
+    "gulp": "^3.9.0",
+    "gulp-connect": "^2.2.0",
+    "gulp-open": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
