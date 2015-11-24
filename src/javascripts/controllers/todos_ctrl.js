@@ -11,16 +11,17 @@ class TodosCtrl {
   }
 
   initList() {
+    var hasResult = false;
+
+    let gotTodos = function(data) {
+      hasResult = true;
+    }
+
     let todos = Util.ajaxReq({
       url: 'http://localhost:3000/api/v1/todos',
-      successFn: function(data) {
-          console.log(data)
-      }
+      jsonpCallback: 'gotTodos',
+      observeRes: function(){return hasResult;}
     })
-  }
-
-  new() {
-
   }
 
   create(params) {

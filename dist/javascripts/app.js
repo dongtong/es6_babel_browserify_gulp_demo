@@ -7,7 +7,28 @@
 
 var _controllersTodos_ctrl = require('./controllers/todos_ctrl');
 
-!(function () {})();
+//var todosCtrl = new TodosCtrl();
+
+//todosCtrl.initList()
+
+(function () {
+  var todosCtrl = new _controllersTodos_ctrl.TodosCtrl();
+  todosCtrl.initList();
+
+  $('.todos-list li').on('mouseover', function () {
+    $(this).find('.actions').show();
+  }).on('mouseout', function () {
+    $(this).find('.actions').hide();
+  });
+
+  $('.todos-list .action').on('click', function () {
+    if ($(this).hasClass('edit')) {
+      alert('edit');
+    } else {
+      alert('remove');
+    }
+  });
+})();
 
 },{"./controllers/todos_ctrl":4}],2:[function(require,module,exports){
 /*
@@ -58,7 +79,8 @@ var Util = {
                 cache: false,
                 timeout: _const.Const.TIME_OUT,
                 crossDomain: true,
-                dataType: "json",
+                dataType: "jsonp",
+                jsonpCallback: options.jsonpCallback || null,
                 contentType: "application/json;utf-8",
                 success: function success(data, status, xhr) {
                     if (typeof options.successFn === 'function') {
@@ -148,16 +170,20 @@ var TodosCtrl = (function () {
   _createClass(TodosCtrl, [{
     key: 'initList',
     value: function initList() {
+      var hasResult = false;
+
+      var gotTodos = function gotTodos(data) {
+        hasResult = true;
+      };
+
       var todos = _commonUtil.Util.ajaxReq({
         url: 'http://localhost:3000/api/v1/todos',
-        successFn: function successFn(data) {
-          console.log(data);
+        jsonpCallback: 'gotTodos',
+        observeRes: function observeRes() {
+          return hasResult;
         }
       });
     }
-  }, {
-    key: 'new',
-    value: function _new() {}
   }, {
     key: 'create',
     value: function create(params) {

@@ -20,7 +20,8 @@ let Util = {
                 cache: false,
                 timeout: Const.TIME_OUT,
                 crossDomain: true,
-                dataType: "json",
+                dataType: "jsonp",
+                jsonpCallback: options.jsonpCallback || null,
                 contentType: "application/json;utf-8",
                 success: function(data, status, xhr){
                     if(typeof options.successFn === 'function') {

@@ -1,9 +1,5 @@
-@import url(http://fonts.googleapis.com/css?family=Shadows+Into+Light);
-
 body,
-html,
-div.board,
-div#container {
+html {
     height: 100%;
     overflow: hidden;
 }
@@ -27,50 +23,65 @@ div.board {
 
 }
 
-div.note {
-    height: 150px;
-    width: 150px;
-    background-color: yellow;
-    margin: 2px 0;
-    position: absolute;
-    cursor: -webkit-grab;
-    -webkit-box-shadow: 5px 5px 15px 0 rgba(0, 0, 0, .2);
-    box-shadow: 5px 5px 15px 0 rgba(0, 0, 0, .2);
+.container {
+    margin: 40px auto;
 }
 
-div.note:active {
-    cursor: -webkit-grabbing;
+#board {
+  padding: 10px auto;
+  border: 1px solid #DCDCDC;
+  box-shadow: 10px 10px 10px #DCDCDC;
+  -webkit-box-shadow: 10px 10px 10px #DCDCDC;
+  -moz-box-shadow: 10px 10px 10px #DCDCDC;
 }
 
-div.note p {
-    font-size: 22px;
-    padding: 5px;
-    font-family: "Shadows Into Light", Arial;
+#board form {
+  margin: 10px auto;
 }
 
-div.note:hover > span {
-    opacity: 1;
+#board form input {
+  border-radius: 0;
+  padding: 5px 10px;
+  line-height: 28px;
+}
+.actions {
+  display: none;
+  float:right;
+}
+.action {
+  width: 28px;
+  height: 28px;
+  text-align: center;
+  vertical-align: middle;
+}
+.actions .edit {
+  color: #468847 !important;
+}
+.actions .remove {
+  color: #b94a48 !important;
+}
+.action:hover {
+  transform: scale(1.02, 1.02);
+  -webkit-transform: scale(1.02, 1.02);
+  -moz-transform: scale(1.02, 1.02);
 }
 
-div.note > span {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    opacity: 0;
-    transition: opacity .25s linear;
+.todos-list {
+  padding-left: 0;
 }
 
-div.note button {
-    margin: 2px;
+.todos-list li {
+  line-height: 28px;
+  padding: 5px;
+  margin: 10px auto;
+  font-size: 18px;
+  vertical-align: middle;
+  border-bottom: 1px dashed #DDD;
+  list-style: none;
+  color: #979797;
 }
 
-div.note > textarea {
-    height: 75%;
-    background: rgba(255, 255, 255, .5);
-}
-
-.glyphicon-plus {
-    position: fixed;
-    top: 10px;
-    right: 10px;
+.todos-list li:hover {
+  /*transform: scale(1.02, 1.2);*/
+  cursor: pointer;
 }

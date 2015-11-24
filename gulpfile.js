@@ -36,7 +36,7 @@ var config = {
 //启动connect服务
 gulp.task('connect', function() {
     connect.server({
-        root: './',
+        root: [__dirname],
         port: config.port,
         base: config.devBaseUrl,
         livereload: true
