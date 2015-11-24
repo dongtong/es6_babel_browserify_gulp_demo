@@ -12,14 +12,9 @@ class TodosCtrl {
 
   initList() {
     let todos = Util.ajaxReq({
-      url: 'http://localhost:3000/api/v1/todos'
-    }).done(function(data){
-      options.done(data);
-    }).fail(function(){
-      if(options.fail){
-        options.fail();
-      }else{
-        Util.ajaxFailCallbak();
+      url: 'http://localhost:3000/api/v1/todos',
+      successFn: function(data) {
+          console.log(data)
       }
     })
   }
@@ -60,3 +55,5 @@ class TodosCtrl {
     })
   }
 }
+
+export {TodosCtrl};

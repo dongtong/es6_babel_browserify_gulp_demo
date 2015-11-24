@@ -1,6 +1,7 @@
 /*
 * Common util object
 */
+import {Const} from './const';
 
 let Util = {
   /*
@@ -15,23 +16,22 @@ let Util = {
             $.ajax({
                 type: options.type || "GET",
                 url: options.url,
-                data: options.data || null,
+                data: options.data || {},
                 cache: false,
                 timeout: Const.TIME_OUT,
                 crossDomain: true,
-                dataType: "jsonp",
-                jsonpCallback: options.jsonpCallback || null,
-                contentType: "application/json;utf-8", 
+                dataType: "json",
+                contentType: "application/json;utf-8",
                 success: function(data, status, xhr){
                     if(typeof options.successFn === 'function') {
-                        options.successFn(data);  
+                        options.successFn(data);
                     }
                 },
                 error: function(xhr, status, errorThrown){
                     //timeout异常交给complete处理
                     if(status !== 'timeout' && !options.observeRes()) {
                         if(typeof options.errorFn === 'function') {
-                            options.errorFn();  
+                            options.errorFn();
                         }else{
                             Util.redirectToErr('0');
                         }
@@ -59,7 +59,7 @@ let Util = {
                                 Util.redirectToErr('1');
                             }
                         }
-                        
+
                     }
 
                 }
@@ -67,6 +67,19 @@ let Util = {
       }
 
       req();
+  },
+
+  redirectToErr: function(errType){
+    switch(errType) {
+        case Const.ERR_CODE.ONE:
+            console.error('timeout error');
+            break;
+        case Const.ERR_CODE.TWO:
+            console.error('timeout error');
+            break;
+        default:
+            console.error('other error');
+    }
   }
 }
 

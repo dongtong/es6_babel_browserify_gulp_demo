@@ -29,7 +29,7 @@ var config = {
     devBaseUrl: 'http://' + getIPAdress(),
     paths: {
         html: './src/*.html',
-        dist: './'
+        dist: './dist'
     }
 };
 
@@ -45,19 +45,14 @@ gulp.task('connect', function() {
 
 //打开浏览器
 gulp.task('open', function() {
-     gulp.src('./index.html')
-         .pipe(open({app: 'chrome', uri: config.devBaseUrl + ':' + config.port + '/' }));
+     gulp.src('./dist/index.html')
+         .pipe(open({app: 'chrome', uri: config.devBaseUrl + ':' + config.port + '/dist/index.html' }));
 });
 
-
-function buildSuccess() {
-    browserify({
-        entries: './src/javascripts/success.js'
-    })
-    .transform(babelify)
-    .bundle()
-    .pipe(source('success.js'))
-    .pipe(gulp.dest('./javascripts'));
+function buildLibs() {
+    gulp.src('src/javascripts/libs/*.js')
+        .pipe(gulp.dest('./dist/javascripts'))
+        .pipe(connect.reload());
 }
 
 //构建业务
@@ -68,41 +63,42 @@ gulp.task('build', function() {
     .transform(babelify)
     .bundle()
     .pipe(source('app.js'))
-    .pipe(gulp.dest('./javascripts'));
-    buildSuccess();
+    .pipe(gulp.dest('./dist/javascripts'));
+
+    buildLibs();
 });
 
 //拷贝HTML
 gulp.task('html', function() {
     gulp.src('src/*.html')
-        .pipe(gulp.dest('./'))
+        .pipe(gulp.dest('./dist'))
         .pipe(connect.reload());
 });
 
 //拷贝CSS
 gulp.task('css', function() {
     gulp.src('src/stylesheets/**')
-        .pipe(gulp.dest('./stylesheets'))
+        .pipe(gulp.dest('./dist/stylesheets'))
         .pipe(connect.reload());
 });
 
 //拷贝Image
 gulp.task('image', function() {
     gulp.src('src/images/**')
-        .pipe(gulp.dest('./images'))
+        .pipe(gulp.dest('./dist/images'))
         .pipe(connect.reload());
 });
 
 //拷贝静态文件到发布目录
 gulp.task('copy', function () {
     gulp.src('src/*.html')
-        .pipe(gulp.dest('./'));
+        .pipe(gulp.dest('./dist'));
 
     gulp.src('src/stylesheets/**')
-        .pipe(gulp.dest('./stylesheets'));
+        .pipe(gulp.dest('./dist/stylesheets'));
 
     gulp.src('src/images/**')
-        .pipe(gulp.dest('./images'));
+        .pipe(gulp.dest('./dist/images'));
 });
 
 //观察文件变化
