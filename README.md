@@ -5,3 +5,6 @@
 - Gulp
 - MVC
 - Browserfiy
+
+
+![截图](dist/images/mvc_hand_by_hand.png)
