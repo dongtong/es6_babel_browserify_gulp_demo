@@ -7,27 +7,9 @@
 
 var _controllersTodos_ctrl = require('./controllers/todos_ctrl');
 
-//var todosCtrl = new TodosCtrl();
-
-//todosCtrl.initList()
-
 (function () {
-  var todosCtrl = new _controllersTodos_ctrl.TodosCtrl();
-  todosCtrl.initList();
-
-  $('.todos-list li').on('mouseover', function () {
-    $(this).find('.actions').show();
-  }).on('mouseout', function () {
-    $(this).find('.actions').hide();
-  });
-
-  $('.todos-list .action').on('click', function () {
-    if ($(this).hasClass('edit')) {
-      alert('edit');
-    } else {
-      alert('remove');
-    }
-  });
+    var todosCtrl = new _controllersTodos_ctrl.TodosCtrl();
+    todosCtrl.initList();
 })();
 
 },{"./controllers/todos_ctrl":4}],2:[function(require,module,exports){
@@ -156,32 +138,72 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _modelsTodo = require('../models/todo');
 
 var _commonUtil = require('../common/util');
 
+var _viewsTodosEdit = require('../views/todos/edit');
+
+var _viewsTodosEdit2 = _interopRequireDefault(_viewsTodosEdit);
+
 var TodosCtrl = (function () {
   function TodosCtrl() {
     _classCallCheck(this, TodosCtrl);
+
+    //define current class namespace
+    window.todosNS = window.todosNs || {};
   }
 
   _createClass(TodosCtrl, [{
     key: 'initList',
     value: function initList() {
-      var hasResult = false;
+      var hasResult = false,
+          that = this;
 
-      var gotTodos = function gotTodos(data) {
+      todosNS.gotTodos = function (res) {
         hasResult = true;
+        if (res.data.length) {
+          res.data.map(function (item) {
+            $('.todos-list').append('<li data-id="' + item.id + '"><span>' + item.content + '</span>' + '<span class="actions">' + '<span class="action edit glyphicon glyphicon-pencil" id="eidt_' + item.id + '"></span>' + '<span class="action remove glyphicon glyphicon-remove" id="remove_' + item.id + '"></span>' + '</span>' + '</li>');
+          });
+          that.observeTodoList();
+        } else {
+          $('.todos-list').append('<li>没有待办事项...</li>');
+        }
       };
 
-      var todos = _commonUtil.Util.ajaxReq({
-        url: 'http://localhost:3000/api/v1/todos',
-        jsonpCallback: 'gotTodos',
+      _commonUtil.Util.ajaxReq({
+        url: 'http://localhost:3000/api/v2/todos',
+        jsonpCallback: 'todosNS.gotTodos',
         observeRes: function observeRes() {
           return hasResult;
         }
+      });
+    }
+  }, {
+    key: 'observeTodoList',
+    value: function observeTodoList() {
+      var _this = this;
+
+      var $this = this;
+      $('.todos-list li').on('mouseover', function () {
+        $(this).find('.actions').show();
+      }).on('mouseout', function () {
+        $(this).find('.actions').hide();
+      });
+
+      $('.todos-list').on('click', '.edit', function () {
+        // can not use () =>
+        $this.edit({
+          id: $(this).attr('id'),
+          value: $(this).parent().prev().text()
+        });
+      }).on('click', '.remove', function () {
+        $this.remove($(_this).attr('id'));
       });
     }
   }, {
@@ -196,13 +218,48 @@ var TodosCtrl = (function () {
     }
   }, {
     key: 'edit',
-    value: function edit(params) {}
+    value: function edit(params) {
+      var $this = this,
+          $li = $('#' + params.id).parents('li');
+
+      $li.html((0, _viewsTodosEdit2['default'])(params)).find('input').on('keyup', function (e) {
+        var newContent = $(this).val();
+        if (e.which == 13) {
+          $this.update({
+            url: 'http://localhost:3000/api/v2/todos/' + params.id.split('_')[1] + '/update?content=' + encodeURIComponent(newContent),
+            done: function done(res) {
+              if (res.success) {
+                $li.html('<span>' + res.content + '</span>' + '<span class="actions">' + '<span class="action edit glyphicon glyphicon-pencil" id="eidt_' + res.id + '"></span>' + '<span class="action remove glyphicon glyphicon-remove" id="remove_' + res.id + '"></span>' + '</span>');
+              } else {
+                alert('更新失败');
+              }
+            }
+          });
+        }
+      });
+    }
   }, {
     key: 'update',
-    value: function update(params) {}
+    value: function update(params) {
+      var hasResult = false;
+
+      todosNS.updatedTodo = function (res) {
+        hasResult = true;
+        params.done(res);
+      };
+
+      _commonUtil.Util.ajaxReq({
+        type: 'PATCH',
+        url: params.url,
+        jsonpCallback: 'todosNS.updatedTodo',
+        observeRes: function observeRes() {
+          return hasResult;
+        }
+      });
+    }
   }, {
-    key: 'destroy',
-    value: function destroy(options) {
+    key: 'remove',
+    value: function remove(options) {
       var result = _commonUtil.Util.ajaxReq({
         type: 'DELETE',
         data: options.params["id"]
@@ -223,7 +280,7 @@ var TodosCtrl = (function () {
 
 exports.TodosCtrl = TodosCtrl;
 
-},{"../common/util":3,"../models/todo":5}],5:[function(require,module,exports){
+},{"../common/util":3,"../models/todo":5,"../views/todos/edit":6}],5:[function(require,module,exports){
 /*
 * @class Todo
 */
@@ -240,5 +297,18 @@ var Todo = function Todo() {
 };
 
 exports.Todo = Todo;
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports["default"] = function (options) {
+  return "<input id=\"" + options.id + "_input\" class=\"edit_input\" value=\"" + options.value + "\"></input>";
+};
+
+module.exports = exports["default"];
 
 },{}]},{},[1]);

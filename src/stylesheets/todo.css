@@ -85,3 +85,7 @@ div.board {
   /*transform: scale(1.02, 1.2);*/
   cursor: pointer;
 }
+
+.edit_input {
+  width: 100%;
+}
