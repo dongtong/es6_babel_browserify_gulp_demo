@@ -9,6 +9,7 @@ var glob = require('glob');
 var del = require('del');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
+var uglify = require('gulp-uglify');
 
 
 function getIPAdress(){
@@ -101,13 +102,19 @@ gulp.task('copy', function () {
         .pipe(gulp.dest('./dist/images'));
 });
 
+gulp.task('compress', function() {
+  return gulp.src('dist/javascripts/*.js')
+    .pipe(uglify())
+    .pipe(gulp.dest('dist/js'));//TODO
+});
+
 //观察文件变化
 gulp.task('watch', function () {
-    gulp.watch('src/**/*.js', ['build']);
+    gulp.watch('src/**/*.js', ['build', 'compress']);
     gulp.watch('src/**/*.css', ['css']);
     gulp.watch('src/**/*.png', ['image']);
     gulp.watch('src/*.html', ['html']);
 });
 
 
-gulp.task('default',  ['copy', 'build', 'connect','watch', 'open']);
+gulp.task('default',  ['copy', 'build', 'compress', 'connect','watch', 'open']);
