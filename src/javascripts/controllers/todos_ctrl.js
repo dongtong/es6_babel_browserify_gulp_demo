@@ -17,6 +17,8 @@ class TodosCtrl {
     var hasResult = false,
         that = this;
 
+    that.observeNew();
+
     todosNS.gotTodos = function(res) {
       hasResult = true;
       if(res.data.length) {
@@ -57,21 +59,70 @@ class TodosCtrl {
           id: $(this).attr('id'),
           value: $(this).parent().prev().text()
         });
-    }).on('click', '.remove', () => {
-        $this.remove($(this).attr('id'))
-    })
+    }).on('click', '.remove', function(){
+        $this.remove($(this).attr('id').split('_')[1]);
+    });
   }
 
-  create(params) {
-    let todoItem = new Todo(params);
-    if(todoItem.save){
-      return {success: true};
-    }else{
-      return {success: false};
+  observeNew() {
+      let $this = this;
+      $('form').on('submit', function(e){
+              e.preventDefault();
+              $this.create($('#new_todo').val());
+              return false;
+      });
+  }
+
+  create(content) {
+    let $this = this,
+        hasResult = false;
+
+    todosNS.addedTodo = function(res) {
+        hasResult = true;
+        if(res.success){
+            $('#new_todo').val("");
+            let newItem = '<li data-id="' + res.id + '"><span>' + res.content + '</span>' +
+              '<span class="actions">' +
+                '<span class="action edit glyphicon glyphicon-pencil" id="eidt_'+res.id+'"></span>' +
+                '<span class="action remove glyphicon glyphicon-remove" id="remove_'+res.id+'"></span>' +
+              '</span>' +
+            '</li>';
+
+            if($('.todos-list span').length){
+                $('.todos-list').append(newItem);
+            }else{
+                $('.todos-list').html(newItem);
+            }
+            $this.observeAddedItem();
+        }else{
+            alert('添加失败!');
+        }
+
     }
+
+    Util.ajaxReq({
+      url: 'http://localhost:3000/api/v2/todos/add?content=' + content,
+      jsonpCallback: 'todosNS.addedTodo',
+      observeRes: function(){return hasResult;}
+    });
   }
 
-  edit(params) {
+  observeAddedItem() {
+      $('.todos-list li:last-child').on('mouseover', function(){
+        $(this).find('.actions').show();
+      }).on('mouseout', function(){
+        $(this).find('.actions').hide();
+      }).on('click', '.edit', function(){ // can not use () =>
+          $this.edit({
+            id: $(this).attr('id'),
+            value: $(this).parent().prev().text()
+          });
+      }).on('click', '.remove', function(){
+          $this.remove($(this).attr('id').split('_')[1]);
+      });
+  }
+
+  edit(params) { //TODO move to model
     let $this = this,
         $li = $('#' + params.id).parents('li');
 
@@ -116,19 +167,30 @@ class TodosCtrl {
     });
   }
 
-  remove(options) {
-    let result = Util.ajaxReq({
-      type: 'DELETE',
-      data: options.params["id"]
-    }).done(function(data){
-      options.done(data);
-    }).fail(function(){
-      if(options.fail){
-        options.fail();
-      }else{
-        Util.ajaxFailCallbak();
-      }
-    })
+  remove(id) {
+    let $this = this,
+        hasResult = false,
+        $li = $('#remove_' + id).parents('li');
+
+    todosNS.removedTodo = function(res) {
+        hasResult = true;
+        if(res.success){
+            if($('.todos-list li').length == 1){
+                $li.replaceWith('<li>没有待办事项...</li>');
+            }else{
+                $li.remove();
+            }
+        }else{
+            alert('删除失败!');
+        }
+
+    }
+
+    Util.ajaxReq({
+      url: 'http://localhost:3000/api/v2/todos/' + id + '/delete',
+      jsonpCallback: 'todosNS.removedTodo',
+      observeRes: function(){return hasResult;}
+    });
   }
 }
 
